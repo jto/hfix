@@ -25,9 +25,6 @@ object list {
   type List[A] = Fix[ListF[A, ?]]
   def nil[A] = Fix[ListF[A, ?]](Nil)
   def cons[A] = (x: A, xs: List[A]) => Fix[ListF[A, ?]](Cons(x, xs))
-
-  def cata[A, F[_]](f: F[A] => A)(t: Fix[F])(implicit fc: Functor[F]): A =
-    f(fc.map(t.f)(cata[A, F](f)))
 }
 
 object hlist {
@@ -38,6 +35,8 @@ object hlist {
 
 object listtest {
   import list._
+  import fix._, syntax._
+
   val xs = cons(1, cons(1, nil))
 
   val sumList =

@@ -1,14 +1,20 @@
 package test
 
+import cats.Functor
+
 package fix {
   case class Fix[F[_]](f: F[Fix[F]])
+
+  object syntax {
+    def cata[A, F[_]](f: F[A] => A)(t: Fix[F])(implicit fc: Functor[F]): A =
+      f(fc.map(t.f)(cata[A, F](f)))
+  }
 }
 
 package hfix {
 
   import shapeless.{ DepFn1, Poly, Poly1 }
   import shapeless.PolyDefns._
-  import cats.Functor
 
   trait Inductive
   case class HFix[F[_], R <: Inductive](f: F[R]) extends Inductive
