@@ -21,6 +21,7 @@ object ListF {
 }
 
 object list {
+  import fix._
   type List[A] = Fix[ListF[A, ?]]
   def nil[A] = Fix[ListF[A, ?]](Nil)
   def cons[A] = (x: A, xs: List[A]) => Fix[ListF[A, ?]](Cons(x, xs))
@@ -30,6 +31,7 @@ object list {
 }
 
 object hlist {
+  import hfix._
   val hnil = HFix[ListF[Nil, ?], INil](Nil)
   def hcons[X, XS <: Inductive](x: X, xs: XS) = HFix[ListF[X, ?], XS](Cons(x, xs))
 }
@@ -47,7 +49,7 @@ object listtest {
 
 object hlisttest {
   import hlist._
-  import Inductive._
+  import hfix._, syntax._
 
   val hs = hcons(1, hcons("bar", hnil))
   val xs = hcons(1, hcons(1, hnil))

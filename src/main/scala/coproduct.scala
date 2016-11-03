@@ -1,5 +1,7 @@
 package test
 
+import hfix._
+
 object coproduct {
   sealed trait :+:[+H, +T]
   final case class Inl[+H, +T](head : H) extends :+:[H, T]
