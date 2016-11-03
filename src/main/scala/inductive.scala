@@ -32,7 +32,7 @@ package hfix {
         }
     }
 
-    object Cata extends LowPriorityCata{
+    object Cata extends LowPriorityCata {
       type Aux[HF <: Poly, L <: Inductive, Out0] = Cata[HF, L] { type Out = Out0 }
 
       def apply[HF <: Poly, L <: Inductive](implicit c: Cata[HF, L]): Aux[HF, L, c.Out] = c
