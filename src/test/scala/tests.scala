@@ -1,36 +1,13 @@
 package test
 
 import org.scalatest._
+import shapeless.Poly1
+import hfix._
+import shapeless.test._
 
 class RulesSpec extends WordSpec with Matchers {
 
-  import shapeless.Poly1
-  import cats.Functor
-
-  trait BaseList
-  trait ListF[+A, +S] extends BaseList
-  trait Nil extends ListF[Nothing, Nothing]
-  object Nil extends Nil
-  case class Cons[A, +S](x: A, xs: S) extends ListF[A, S]
-
-  object ListF {
-    implicit def listFFunctor[T] =
-      new Functor[ListF[T, ?]] {
-        def map[A, B](fa: ListF[T, A])(f: A => B): ListF[T, B] =
-          fa match {
-            case Nil => Nil
-            case Cons(x, xs) => Cons(x, f(xs))
-          }
-      }
-  }
-
   "Fix" should {
-    object list {
-      import fix._
-      type List[A] = Fix[ListF[A, ?]]
-      def nil[A] = Fix[ListF[A, ?]](Nil)
-      def cons[A] = (x: A, xs: List[A]) => Fix[ListF[A, ?]](Cons(x, xs))
-    }
 
     "implement list and sum" in {
       import list._
@@ -49,15 +26,9 @@ class RulesSpec extends WordSpec with Matchers {
   }
 
   "HFix" should {
-    object hlist {
-      import hfix._
-      val hnil = HFix[ListF[Nil, ?], INil](Nil)
-      def hcons[X, XS <: Inductive](x: X, xs: XS) = HFix[ListF[X, ?], XS](Cons(x, xs))
-    }
 
     "implement hlist and sum" in {
-      import hlist._
-      import hfix._, syntax._
+      import hlist._, syntax._
 
       val hs = hcons(1, hcons("bar", hnil))
       val xs = hcons(1, hcons(2, hcons(3, hnil)))
@@ -71,10 +42,6 @@ class RulesSpec extends WordSpec with Matchers {
           }
       }
 
-      object plus1 extends Poly1 {
-        implicit def caseInt = at[Int] { _ + 1 }
-      }
-
       val sum0 = cata(hnil, plus)
       val sum1 = cata(hcons(1, hnil), plus)
       val sum2 = cata(xs, plus)
@@ -82,6 +49,13 @@ class RulesSpec extends WordSpec with Matchers {
       sum0 shouldBe 0
       sum1 shouldBe 1
       sum2 shouldBe 6
+    }
+
+    "implement a coproduct" in {
+      import coproduct._
+      Coproduct[Int :+: String :+: INil](1) shouldBe HFix(Inl(1))
+      Coproduct[Int :+: String :+: INil]("bar") shouldBe HFix(Inr(HFix(Inl("bar"))))
+      illTyped("Coproduct[Int :+: String :+: INil](1.2)")
     }
   }
 }
