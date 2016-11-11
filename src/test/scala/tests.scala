@@ -13,7 +13,7 @@ class RulesSpec extends WordSpec with Matchers {
       import list._
       import fix._, syntax._
 
-      val xs = cons(1, cons(2, cons(3, nil)))
+      val xs: list.List[Int] = cons(1, cons(2, cons(3, nil)))
 
       val sumList =
         cata[Int, ListF[Int, ?]] {
@@ -30,8 +30,8 @@ class RulesSpec extends WordSpec with Matchers {
     "implement hlist and sum" in {
       import hlist._, syntax._
 
-      val hs = hcons(1, hcons("bar", hnil))
-      val xs = hcons(1, hcons(2, hcons(3, hnil)))
+      val hs: Int :: String :: HNil = hcons(1, hcons("bar", hnil))
+      val xs: Int :: Int :: Int :: HNil = hcons(1, hcons(2, hcons(3, hnil)))
 
       object plus extends Poly1 {
         implicit def caseNil =

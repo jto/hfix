@@ -1,7 +1,6 @@
 package test
 
-trait BaseList
-trait ListF[+A, +S] extends BaseList
+trait ListF[+A, +S]
 trait Nil extends ListF[Nothing, Nothing]
 object Nil extends Nil
 case class Cons[A, +S](x: A, xs: S) extends ListF[A, S]
