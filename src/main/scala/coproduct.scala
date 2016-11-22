@@ -7,6 +7,7 @@ object coproduct {
   final case class Inl[+H, +T](head: H) extends Cocons[H, T]
   final case class Inr[+H, +T](tail: T) extends Cocons[H, T]
 
+  type CNil = HFix[Nothing, Nothing]
   type :+:[H, T <: Inductive] = HFix[Cocons[H, ?], T]
 
   trait Inject[C <: Inductive, I] {

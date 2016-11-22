@@ -17,7 +17,7 @@ class RulesSpec extends WordSpec with Matchers {
 
       val sumList =
         cata[Int, ListF[Int, ?]] {
-          case Nil => 0
+          case Nil() => 0
           case Cons(x, n) => x + n
         } _
 
@@ -34,10 +34,10 @@ class RulesSpec extends WordSpec with Matchers {
       val xs: Int :: Int :: Int :: HNil = hcons(1, hcons(2, hcons(3, hnil)))
 
       object plus extends Poly1 {
-        implicit def caseNil =
-          at[ListF[Nil, INil]] { _ => 0 }
+        implicit def caseNil[A] =
+          at[Nil[A]] { _ => 0 }
         implicit def caseInt =
-          at[ListF[Int, Int]] {
+          at[Cons[Int, Int]] {
             case Cons(x, n) => x + n
           }
       }
@@ -53,9 +53,9 @@ class RulesSpec extends WordSpec with Matchers {
 
     "implement a coproduct" in {
       import coproduct._
-      Coproduct[Int :+: String :+: INil](1) shouldBe HFix(Inl(1))
-      Coproduct[Int :+: String :+: INil]("bar") shouldBe HFix(Inr(HFix(Inl("bar"))))
-      illTyped("Coproduct[Int :+: String :+: INil](1.2)")
+      Coproduct[Int :+: String :+: CNil](1) shouldBe HFix(Inl(1))
+      Coproduct[Int :+: String :+: CNil]("bar") shouldBe HFix(Inr(HFix(Inl("bar"))))
+      illTyped("Coproduct[Int :+: String :+: CNil](1.2)")
     }
   }
 }
