@@ -18,7 +18,6 @@ package hfix {
 
   trait Inductive
   case class HFix[F[_], R <: Inductive](f: F[R]) extends Inductive
-  trait INil extends Inductive
 
   package ops {
     trait Cata[HF, L <: Inductive] extends DepFn1[L]
@@ -37,10 +36,10 @@ package hfix {
 
       def apply[HF <: Poly, L <: Inductive](implicit c: Cata[HF, L]): Aux[HF, L, c.Out] = c
 
-      implicit def lastCata[HF <: Poly, F[_]](implicit fc: Functor[F], f: Case1[HF, F[INil]]): Aux[HF, HFix[F, INil], f.Result] =
-        new Cata[HF, HFix[F, INil]] {
-          type Out = f.Result
-          def apply(t: HFix[F, INil]) = f(t.f)
+      implicit def nothingCata[HF <: Poly, R]: Aux[HF, Uninhabited, R] =
+        new Cata[HF, Uninhabited] {
+          type Out = R
+          def apply(t: Uninhabited) = t
         }
     }
   }
@@ -50,4 +49,9 @@ package hfix {
     def cata[HF <: Poly, L <: Inductive](l: L, f: HF)(implicit c: Cata[HF, L]) =
       c(l)
   }
+}
+
+package object hfix {
+  // see Miles Sabin's workaround at https://issues.scala-lang.org/browse/SI-9453
+  type Uninhabited = Nothing { type T = Unit }
 }
